@@ -8,9 +8,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import rfidhandler.entity.animal.Animal;
+import rfidhandler.entity.animal.AnimalHandler;
 import rfidhandler.thread.SerialAutoconnectThread;
 import rfidhandler.thread.SerialReaderThread;
-import rfidhandler.utils.AnimalHandler;
 
 public class App {
 	
@@ -69,8 +70,8 @@ public class App {
         	destroy();
         });
 		stage.setScene(scene);
-		stage.setWidth(600);
-		stage.setHeight(300);
+		stage.setWidth(300);
+		stage.setHeight(400);
 		stage.setTitle(APP_NAME);
 		stage.getIcons().add(new Image(getClass().getResourceAsStream("/appicon.png")));
         stage.show();

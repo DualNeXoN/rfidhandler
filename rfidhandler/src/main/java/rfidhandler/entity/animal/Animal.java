@@ -1,14 +1,19 @@
-package rfidhandler;
+package rfidhandler.entity.animal;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import rfidhandler.App;
+import rfidhandler.RfidUid;
+import rfidhandler.entity.vaccine.Vaccine;
+import rfidhandler.entity.vaccine.VaccineHandler;
 
 public class Animal {
 	
@@ -17,6 +22,7 @@ public class Animal {
 	private String name = null;
 	private String type = null;
 	private Image image = null;
+	private LinkedList<Vaccine> vaccines = null;
 	
 	public Animal(Builder builder) {
 		this.id = builder.id;
@@ -44,6 +50,15 @@ public class Animal {
 	
 	public Image getImage() {
 		return image;
+	}
+	
+	public LinkedList<Vaccine> getVaccines() {
+		refreshVaccines();
+		return vaccines;
+	}
+	
+	public void refreshVaccines() {
+		vaccines = VaccineHandler.loadVaccines(this);
 	}
 	
 	public static class Builder {

@@ -1,13 +1,12 @@
-package rfidhandler.utils;
+package rfidhandler.entity.animal;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import rfidhandler.Animal;
-import rfidhandler.Animal.Builder;
 import rfidhandler.DBConnection;
 import rfidhandler.RfidUid;
+import rfidhandler.entity.animal.Animal.Builder;
 
 public abstract class AnimalHandler {
 	
@@ -33,6 +32,8 @@ public abstract class AnimalHandler {
             	animal = builder.build();
             	
             }
+            stmt.close();
+            result.close();
             connection.close();
             return animal;
         } catch(Exception exception) {
