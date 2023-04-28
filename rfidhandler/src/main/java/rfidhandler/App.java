@@ -3,6 +3,7 @@ package rfidhandler;
 import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -11,6 +12,8 @@ import javafx.stage.Stage;
 import rfidhandler.entity.animal.Animal;
 import rfidhandler.entity.animal.AnimalHandler;
 import rfidhandler.entity.rfid.RfidUid;
+import rfidhandler.entity.vaccine.VaccineHandler;
+import rfidhandler.entity.vaccine.ui.VaccineAddDialog;
 import rfidhandler.entity.vaccine.ui.VaccineTable;
 import rfidhandler.thread.SerialAutoconnectThread;
 import rfidhandler.thread.SerialReaderThread;
@@ -43,7 +46,10 @@ public class App {
 	private Label labelName;
 	private Label labelType;
 	private ImageView blob;
+	private Button btnAddVaccine;
 	private VaccineTable vaccineTable;
+	
+	private Animal animal;
 	
 	public App(Stage stage) {
 		if(instance != null) return;
@@ -63,10 +69,21 @@ public class App {
 		box.getChildren().add(labelName = new Label(String.format(FORMATTER_LABEL_NAME, "?")));
 		box.getChildren().add(labelType = new Label(String.format(FORMATTER_LABEL_TYPE, "?")));
 		box.getChildren().add(blob = new ImageView(NO_IMAGE));
+		box.getChildren().add(btnAddVaccine = new Button("Add vaccine"));
 		box.getChildren().add(vaccineTable = new VaccineTable());
 		
 		blob.setFitWidth(100);
 		blob.setFitHeight(100);
+		
+		btnAddVaccine.setOnAction(e -> {
+			VaccineAddDialog dialog = new VaccineAddDialog();
+			dialog.showAndWait();
+			if(dialog.isCancelled()) return;
+			VaccineHandler.addVaccine(animal.getId(), dialog.getTimestamp(), dialog.getDescription());
+			vaccineTable.getItems().clear();
+			vaccineTable.applyItems(animal.getVaccines());
+		});
+		btnAddVaccine.setDisable(true);
 		
 		serialAutoconnect();
 		
@@ -74,7 +91,7 @@ public class App {
         	destroy();
         });
 		stage.setScene(scene);
-		stage.setWidth(300);
+		stage.setWidth(400);
 		stage.setHeight(600);
 		stage.setTitle(APP_NAME);
 		stage.getIcons().add(new Image(getClass().getResourceAsStream("/appicon.png")));
@@ -82,7 +99,8 @@ public class App {
 	}
 	
 	public void loadAnimal(String uid) {
-		Animal animal = AnimalHandler.loadAnimal(new RfidUid(uid));
+		animal = AnimalHandler.loadAnimal(new RfidUid(uid));
+		btnAddVaccine.setDisable(animal == null);
 		labelRfid.setText(String.format(FORMATTER_LABEL_RFID, uid));
 		vaccineTable.getItems().clear();
 		if(animal != null) {

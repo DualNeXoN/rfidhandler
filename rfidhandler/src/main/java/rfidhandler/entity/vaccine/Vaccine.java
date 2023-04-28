@@ -30,8 +30,17 @@ public class Vaccine {
 		return timestamp;
 	}
 	
+	public void setTimestamp(Timestamp timestamp) {
+		this.timestamp = timestamp;
+	}
+	
 	public String getDescription() {
 		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
+		VaccineHandler.updateVaccine(this);
 	}
 	
 	public static class Builder {
