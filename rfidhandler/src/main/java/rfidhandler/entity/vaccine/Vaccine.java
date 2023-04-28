@@ -45,6 +45,7 @@ public class Vaccine {
 		public Builder(int id, Animal animal, Timestamp timestamp) {
 			this.id = id;
 			this.animal = animal;
+			this.timestamp = timestamp;
 		}
 		
 		public Builder withDescription(String description) {
