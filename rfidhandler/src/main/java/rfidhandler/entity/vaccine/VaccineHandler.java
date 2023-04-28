@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.LinkedList;
 
-import rfidhandler.DBConnection;
+import rfidhandler.db.DBConnection;
 import rfidhandler.entity.animal.Animal;
 import rfidhandler.entity.vaccine.Vaccine.Builder;
 

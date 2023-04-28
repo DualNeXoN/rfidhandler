@@ -4,9 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import rfidhandler.DBConnection;
-import rfidhandler.RfidUid;
+import rfidhandler.db.DBConnection;
 import rfidhandler.entity.animal.Animal.Builder;
+import rfidhandler.entity.rfid.RfidUid;
 
 public abstract class AnimalHandler {
 	

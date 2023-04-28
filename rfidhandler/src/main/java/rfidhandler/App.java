@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import rfidhandler.entity.animal.Animal;
 import rfidhandler.entity.animal.AnimalHandler;
+import rfidhandler.entity.rfid.RfidUid;
 import rfidhandler.thread.SerialAutoconnectThread;
 import rfidhandler.thread.SerialReaderThread;
 

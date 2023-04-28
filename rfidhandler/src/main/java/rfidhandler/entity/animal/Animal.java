@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import rfidhandler.App;
-import rfidhandler.RfidUid;
+import rfidhandler.entity.rfid.RfidUid;
 import rfidhandler.entity.vaccine.Vaccine;
 import rfidhandler.entity.vaccine.VaccineHandler;
 

@@ -1,4 +1,4 @@
-package rfidhandler;
+package rfidhandler.entity.rfid;
 
 import rfidhandler.utils.Decoder;
 

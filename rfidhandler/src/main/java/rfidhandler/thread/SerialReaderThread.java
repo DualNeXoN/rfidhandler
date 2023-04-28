@@ -4,7 +4,7 @@ import com.fazecast.jSerialComm.SerialPort;
 
 import javafx.application.Platform;
 import rfidhandler.App;
-import rfidhandler.RfidUid;
+import rfidhandler.entity.rfid.RfidUid;
 import rfidhandler.utils.PortDetector;
 
 public class SerialReaderThread extends SerialThread {
