@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import rfidhandler.entity.animal.Animal;
 import rfidhandler.entity.animal.AnimalHandler;
 import rfidhandler.entity.rfid.RfidUid;
+import rfidhandler.entity.vaccine.ui.VaccineTable;
 import rfidhandler.thread.SerialAutoconnectThread;
 import rfidhandler.thread.SerialReaderThread;
 
@@ -42,6 +43,7 @@ public class App {
 	private Label labelName;
 	private Label labelType;
 	private ImageView blob;
+	private VaccineTable vaccineTable;
 	
 	public App(Stage stage) {
 		if(instance != null) return;
@@ -61,6 +63,7 @@ public class App {
 		box.getChildren().add(labelName = new Label(String.format(FORMATTER_LABEL_NAME, "?")));
 		box.getChildren().add(labelType = new Label(String.format(FORMATTER_LABEL_TYPE, "?")));
 		box.getChildren().add(blob = new ImageView(NO_IMAGE));
+		box.getChildren().add(vaccineTable = new VaccineTable());
 		
 		blob.setFitWidth(100);
 		blob.setFitHeight(100);
@@ -72,7 +75,7 @@ public class App {
         });
 		stage.setScene(scene);
 		stage.setWidth(300);
-		stage.setHeight(400);
+		stage.setHeight(600);
 		stage.setTitle(APP_NAME);
 		stage.getIcons().add(new Image(getClass().getResourceAsStream("/appicon.png")));
         stage.show();
@@ -81,11 +84,13 @@ public class App {
 	public void loadAnimal(String uid) {
 		Animal animal = AnimalHandler.loadAnimal(new RfidUid(uid));
 		labelRfid.setText(String.format(FORMATTER_LABEL_RFID, uid));
+		vaccineTable.getItems().clear();
 		if(animal != null) {
 			labelId.setText(String.format(FORMATTER_LABEL_ID, Integer.toString(animal.getId())));
 			labelName.setText(String.format(FORMATTER_LABEL_NAME, animal.getName()));
 			labelType.setText(String.format(FORMATTER_LABEL_TYPE, animal.getType()));
 			blob.setImage(animal.getImage());
+			vaccineTable.applyItems(animal.getVaccines());
 		} else {
 			labelId.setText(String.format(FORMATTER_LABEL_ID, "?"));
 			labelName.setText(String.format(FORMATTER_LABEL_NAME, "?"));

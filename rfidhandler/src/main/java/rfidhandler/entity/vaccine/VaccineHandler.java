@@ -18,7 +18,7 @@ public abstract class VaccineHandler {
         try {
             Connection connection = DBConnection.getConnection();
             
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM vaccination WHERE animal_id=?");
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM vaccination WHERE animal_id=? ORDER BY time DESC");
             stmt.setInt(1, animal.getId());
             ResultSet result = stmt.executeQuery();
             while(result.next()) {
