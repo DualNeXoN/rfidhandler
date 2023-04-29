@@ -28,8 +28,8 @@ public class VaccineTable extends TableView<Vaccine> {
 		getColumns().add(descriptionColumn);
 		
 		TableColumn<Vaccine, Timestamp> timeColumn = new TableColumn<>("Time");
-		timeColumn.setMinWidth(115);
-		timeColumn.setMaxWidth(115);
+		timeColumn.setMinWidth(130);
+		timeColumn.setMaxWidth(130);
 		timeColumn.setResizable(false);
 		timeColumn.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
 		timeColumn.setCellFactory(new Callback<TableColumn<Vaccine,Timestamp>, TableCell<Vaccine,Timestamp>>() {
@@ -52,8 +52,8 @@ public class VaccineTable extends TableView<Vaccine> {
 		getColumns().add(timeColumn);
 
 		TableColumn<Vaccine, Void> deleteColumn = new TableColumn<>("Action");
-		deleteColumn.setMinWidth(57);
-		deleteColumn.setMaxWidth(57);
+		deleteColumn.setMinWidth(50);
+		deleteColumn.setMaxWidth(50);
 		deleteColumn.setResizable(false);
 		deleteColumn.setSortable(false);
 		deleteColumn.setReorderable(false);
@@ -61,7 +61,7 @@ public class VaccineTable extends TableView<Vaccine> {
 			@Override
 			public TableCell<Vaccine, Void> call(TableColumn<Vaccine, Void> param) {
 				final TableCell<Vaccine, Void> cell = new TableCell<Vaccine, Void>() {
-					private final Button deleteButton = new Button("Delete");
+					private final Button deleteButton = new Button("X");
 
 					{
 						deleteButton.setOnAction((event) -> {
@@ -90,6 +90,11 @@ public class VaccineTable extends TableView<Vaccine> {
 		setMaxHeight(150);
 		setMinWidth(380);
 		setEditable(true);
+		getStyleClass().add("vaccine-table");
+		descriptionColumn.getStyleClass().add("table-column");
+		timeColumn.getStyleClass().add("table-column");
+		deleteColumn.getStyleClass().add("table-column");
+		deleteColumn.getStyleClass().add("action");
 	}
 	
 	public void applyItems(LinkedList<Vaccine> list) {

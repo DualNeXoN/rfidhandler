@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import javax.sql.rowset.serial.SerialBlob;
 
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -16,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -36,10 +38,6 @@ public class App {
 	
 	public static final String APP_NAME = "RfidHandler";
 	public static final String FORMATTER_CONNECTION_STATUS = "Arduino is %s";
-	public static final String FORMATTER_LABEL_ID = "ID: %s";
-	public static final String FORMATTER_LABEL_RFID = "RFID: %s";
-	public static final String FORMATTER_LABEL_NAME = "Name: %s";
-	public static final String FORMATTER_LABEL_TYPE = "Type: %s";
 	public static final Image NO_IMAGE = new Image(App.class.getResourceAsStream("/noimage.png"));
 	
 	private static App instance;
@@ -74,17 +72,14 @@ public class App {
 		this.scene = new Scene(this.root);
 		this.stage.setScene(scene);
 		
-		VBox box = new VBox(5);
-		root.getChildren().add(box);
-		
-		box.getChildren().add(labelConnection = new Label(String.format(FORMATTER_CONNECTION_STATUS, ConnectionStatus.DISCONNECTED.name().toLowerCase())));
-		box.getChildren().add(labelRfid = new Label(String.format(FORMATTER_LABEL_RFID, "?")));
-		box.getChildren().add(labelId = new Label(String.format(FORMATTER_LABEL_ID, "?")));
-		box.getChildren().add(labelName = new Label(String.format(FORMATTER_LABEL_NAME, "?")));
-		box.getChildren().add(labelType = new Label(String.format(FORMATTER_LABEL_TYPE, "?")));
-		box.getChildren().add(blob = new ImageView(NO_IMAGE));
-		box.getChildren().add(btnAddVaccine = new Button("Add vaccine"));
-		box.getChildren().add(vaccineTable = new VaccineTable());
+		labelConnection = new Label(String.format(FORMATTER_CONNECTION_STATUS, ConnectionStatus.DISCONNECTED.name().toLowerCase()));
+		labelRfid = new Label("?");
+		labelId = new Label("?");
+		labelName = new Label("?");
+		labelType = new Label("?");
+		blob = new ImageView(NO_IMAGE);
+		btnAddVaccine = new Button("Add vaccine");
+		vaccineTable = new VaccineTable();
 		
 		ContextMenu contextMenuName = new ContextMenu();
 		MenuItem menuItemNameChange = new MenuItem("Edit");
@@ -124,8 +119,6 @@ public class App {
 			if(animal != null) contextMenuType.show(labelType, e.getScreenX(), e.getScreenY());
 		});
 		
-		blob.setFitWidth(100);
-		blob.setFitHeight(100);
 		ContextMenu contextMenuBlob = new ContextMenu();
 		MenuItem menuItemBlobChange = new MenuItem("Change");
 		menuItemBlobChange.setOnAction(e -> {
@@ -158,6 +151,44 @@ public class App {
 		});
 		btnAddVaccine.setDisable(true);
 		
+		VBox vBox = new VBox();
+		vBox.setSpacing(10);
+
+		HBox connectionBox = new HBox(labelConnection);
+		connectionBox.setAlignment(Pos.CENTER_RIGHT);
+		connectionBox.setPrefHeight(50);
+
+		HBox idBox = new HBox(new Label("ID: "), labelId);
+		idBox.setSpacing(10);
+		idBox.setAlignment(Pos.CENTER_LEFT);
+
+		HBox rfidBox = new HBox(new Label("RFID: "), labelRfid);
+		rfidBox.setSpacing(10);
+		rfidBox.setAlignment(Pos.CENTER_LEFT);
+
+		HBox nameBox = new HBox(new Label("Name: "), labelName);
+		nameBox.setSpacing(10);
+		nameBox.setAlignment(Pos.CENTER_LEFT);
+
+		HBox typeBox = new HBox(new Label("Type: "), labelType);
+		typeBox.setSpacing(10);
+		typeBox.setAlignment(Pos.CENTER_LEFT);
+
+		vBox.getChildren().addAll(connectionBox, idBox, rfidBox, nameBox, typeBox, blob, btnAddVaccine, vaccineTable);
+		root.getChildren().add(vBox);
+
+		labelConnection.getStyleClass().add("connection-label");
+		labelId.getStyleClass().add("info-label");
+		labelRfid.getStyleClass().add("info-label");
+		labelName.getStyleClass().add("info-label");
+		labelType.getStyleClass().add("info-label");
+		blob.getStyleClass().add("imageView");
+		scene.getStylesheets().add("main.css");
+		btnAddVaccine.getStyleClass().add("button-add-vaccine");
+		
+		blob.setFitWidth(150);
+		blob.setFitHeight(150);
+		
 		serialAutoconnect();
 		
 		stage.setOnCloseRequest(e -> {
@@ -166,6 +197,7 @@ public class App {
 		stage.setScene(scene);
 		stage.setWidth(400);
 		stage.setHeight(600);
+		stage.setResizable(false);
 		stage.setTitle(APP_NAME);
 		stage.getIcons().add(new Image(getClass().getResourceAsStream("/appicon.png")));
         stage.show();
@@ -174,18 +206,18 @@ public class App {
 	public void loadAnimal(String uid) {
 		animal = AnimalHandler.loadAnimal(new RfidUid(uid));
 		btnAddVaccine.setDisable(animal == null);
-		labelRfid.setText(String.format(FORMATTER_LABEL_RFID, uid));
+		labelRfid.setText(uid);
 		vaccineTable.getItems().clear();
 		if(animal != null) {
-			labelId.setText(String.format(FORMATTER_LABEL_ID, Integer.toString(animal.getId())));
-			labelName.setText(String.format(FORMATTER_LABEL_NAME, animal.getName()));
-			labelType.setText(String.format(FORMATTER_LABEL_TYPE, animal.getType()));
+			labelId.setText(Integer.toString(animal.getId()));
+			labelName.setText(animal.getName());
+			labelType.setText(animal.getType());
 			blob.setImage(animal.getImage());
 			vaccineTable.applyItems(animal.getVaccines());
 		} else {
-			labelId.setText(String.format(FORMATTER_LABEL_ID, "?"));
-			labelName.setText(String.format(FORMATTER_LABEL_NAME, "?"));
-			labelType.setText(String.format(FORMATTER_LABEL_TYPE, "?"));
+			labelId.setText("?");
+			labelName.setText("?");
+			labelType.setText("?");
 			blob.setImage(NO_IMAGE);
 			if(AnimalNewRecordDialog.show()) {
 				AnimalCreateDialog dialog = new AnimalCreateDialog();
@@ -225,6 +257,14 @@ public class App {
 			@Override
 			public void run() {
 				labelConnection.setText(String.format(FORMATTER_CONNECTION_STATUS, status.name().toLowerCase()));
+				if(status.equals(ConnectionStatus.CONNECTED)) {
+					labelConnection.getStyleClass().add("connected");
+					labelConnection.getStyleClass().remove("disconnected");
+				}
+				else {
+					labelConnection.getStyleClass().add("disconnected");
+					labelConnection.getStyleClass().remove("connected");
+				}
 			}
 		});
 	}
