@@ -127,4 +127,25 @@ public abstract class AnimalHandler {
 		return list;
 	}
 	
+	public static boolean createAnimal(String uid, String name, int animalTypeId) {
+		try {
+            Connection connection = DBConnection.getConnection();
+            
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO animal (uid, name, animal_type_id) VALUES (?, ?, ?)");
+            stmt.setString(1, uid);
+            stmt.setString(2, name);
+            stmt.setInt(3, animalTypeId);
+            
+            stmt.execute();
+            
+            stmt.close();
+            connection.close();
+            return true;
+        } catch(Exception exception) {
+            System.out.println(exception);
+        }
+		
+		return false;
+	}
+	
 }

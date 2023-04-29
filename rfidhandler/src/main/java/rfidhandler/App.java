@@ -21,7 +21,9 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import rfidhandler.entity.animal.Animal;
 import rfidhandler.entity.animal.AnimalHandler;
+import rfidhandler.entity.animal.ui.AnimalCreateDialog;
 import rfidhandler.entity.animal.ui.AnimalNameEditDialog;
+import rfidhandler.entity.animal.ui.AnimalNewRecordDialog;
 import rfidhandler.entity.animal.ui.AnimalTypeEditDialog;
 import rfidhandler.entity.rfid.RfidUid;
 import rfidhandler.entity.vaccine.VaccineHandler;
@@ -185,6 +187,14 @@ public class App {
 			labelName.setText(String.format(FORMATTER_LABEL_NAME, "?"));
 			labelType.setText(String.format(FORMATTER_LABEL_TYPE, "?"));
 			blob.setImage(NO_IMAGE);
+			if(AnimalNewRecordDialog.show()) {
+				AnimalCreateDialog dialog = new AnimalCreateDialog();
+				dialog.showAndWait();
+				if(dialog.isCancelled()) return;
+				if(AnimalHandler.createAnimal(uid, dialog.getNewName(), dialog.getNewTypeId())) {
+					loadAnimal(uid);
+				}
+			}
 		}
 	}
 	
