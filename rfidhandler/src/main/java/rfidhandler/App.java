@@ -1,16 +1,28 @@
 package rfidhandler;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.sql.SQLException;
+
+import javax.sql.rowset.serial.SerialBlob;
+
 import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import rfidhandler.entity.animal.Animal;
 import rfidhandler.entity.animal.AnimalHandler;
+import rfidhandler.entity.animal.ui.AnimalNameEditDialog;
+import rfidhandler.entity.animal.ui.AnimalTypeEditDialog;
 import rfidhandler.entity.rfid.RfidUid;
 import rfidhandler.entity.vaccine.VaccineHandler;
 import rfidhandler.entity.vaccine.ui.VaccineAddDialog;
@@ -72,16 +84,75 @@ public class App {
 		box.getChildren().add(btnAddVaccine = new Button("Add vaccine"));
 		box.getChildren().add(vaccineTable = new VaccineTable());
 		
+		ContextMenu contextMenuName = new ContextMenu();
+		MenuItem menuItemNameChange = new MenuItem("Edit");
+		menuItemNameChange.setOnAction(e -> {
+			if(animal == null) {
+				contextMenuName.hide();
+				return;
+			}
+			AnimalNameEditDialog dialog = new AnimalNameEditDialog(animal.getName());
+			dialog.showAndWait();
+			if(dialog.isCancelled()) return;
+			if(AnimalHandler.changeName(animal, dialog.getNewName())) {
+				loadAnimal(animal.getRfid().getUidString());
+			}
+		});
+		contextMenuName.getItems().add(menuItemNameChange);
+		labelName.setOnContextMenuRequested(e -> {
+			if(animal != null) contextMenuName.show(labelName, e.getScreenX(), e.getScreenY());
+		});
+		
+		ContextMenu contextMenuType = new ContextMenu();
+		MenuItem menuItemTypeChange = new MenuItem("Edit");
+		menuItemTypeChange.setOnAction(e -> {
+			if(animal == null) {
+				contextMenuType.hide();
+				return;
+			}
+			AnimalTypeEditDialog dialog = new AnimalTypeEditDialog();
+			dialog.showAndWait();
+			if(dialog.isCancelled()) return;
+			if(AnimalHandler.changeType(animal, dialog.getNewTypeId())) {
+				loadAnimal(animal.getRfid().getUidString());
+			}
+		});
+		contextMenuType.getItems().add(menuItemTypeChange);
+		labelType.setOnContextMenuRequested(e -> {
+			if(animal != null) contextMenuType.show(labelType, e.getScreenX(), e.getScreenY());
+		});
+		
 		blob.setFitWidth(100);
 		blob.setFitHeight(100);
+		ContextMenu contextMenuBlob = new ContextMenu();
+		MenuItem menuItemBlobChange = new MenuItem("Change");
+		menuItemBlobChange.setOnAction(e -> {
+			if(animal == null) {
+				contextMenuBlob.hide();
+				return;
+			}
+			FileChooser fileChooser = new FileChooser();
+			File file = fileChooser.showOpenDialog(null);
+			if(file == null) return;
+			try {
+				byte[] imageData = Files.readAllBytes(file.toPath());
+				if(AnimalHandler.changeImage(animal, new SerialBlob(imageData))) {
+					loadAnimal(animal.getRfid().getUidString());
+				}
+			} catch (IOException | SQLException ex) {}
+		});
+		contextMenuBlob.getItems().add(menuItemBlobChange);
+		blob.setOnContextMenuRequested(e -> {
+			if(animal != null) contextMenuBlob.show(blob, e.getScreenX(), e.getScreenY());
+		});
 		
 		btnAddVaccine.setOnAction(e -> {
 			VaccineAddDialog dialog = new VaccineAddDialog();
 			dialog.showAndWait();
 			if(dialog.isCancelled()) return;
-			VaccineHandler.addVaccine(animal.getId(), dialog.getTimestamp(), dialog.getDescription());
-			vaccineTable.getItems().clear();
-			vaccineTable.applyItems(animal.getVaccines());
+			if(VaccineHandler.addVaccine(animal.getId(), dialog.getTimestamp(), dialog.getDescription())) {
+				loadAnimal(animal.getRfid().getUidString());
+			}
 		});
 		btnAddVaccine.setDisable(true);
 		
