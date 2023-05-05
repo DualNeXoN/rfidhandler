@@ -12,6 +12,8 @@ import javax.imageio.ImageIO;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import rfidhandler.App;
+import rfidhandler.entity.owner.Owner;
+import rfidhandler.entity.owner.OwnerHandler;
 import rfidhandler.entity.rfid.RfidUid;
 import rfidhandler.entity.vaccine.Vaccine;
 import rfidhandler.entity.vaccine.VaccineHandler;
@@ -24,6 +26,8 @@ public class Animal {
 	private Date dob = null;
 	private String type = null;
 	private Image image = null;
+	private int ownerId;
+	private Owner owner = null;
 	private LinkedList<Vaccine> vaccines = null;
 	
 	public Animal(Builder builder) {
@@ -33,6 +37,7 @@ public class Animal {
 		this.dob = builder.dob;
 		this.type = builder.type;
 		this.image = builder.image;
+		this.ownerId = builder.ownerId;
 	}
 	
 	public int getId() {
@@ -64,6 +69,11 @@ public class Animal {
 		return image;
 	}
 	
+	public Owner getOwner() {
+		if(owner == null) owner = OwnerHandler.loadOwner(ownerId);
+		return owner;
+	}
+	
 	public LinkedList<Vaccine> getVaccines() {
 		refreshVaccines();
 		return vaccines;
@@ -82,6 +92,7 @@ public class Animal {
 		private Date dob = null;
 		private String type = null;
 		private Image image = App.NO_IMAGE;
+		private int ownerId;
 		
 		public Builder(int id, RfidUid rfid) {
 			this.id = id;
@@ -109,6 +120,11 @@ public class Animal {
 				this.image = SwingFXUtils.toFXImage(ImageIO.read(in), null);
 				in.close();
 			} catch (SQLException | IOException e) {}
+			return this;
+		}
+		
+		public Builder withOwner(int ownerId) {
+			this.ownerId = ownerId;
 			return this;
 		}
 		

@@ -18,7 +18,7 @@ public abstract class AnimalHandler {
         try {
             Connection connection = DBConnection.getConnection();
             
-            PreparedStatement stmt = connection.prepareStatement("SELECT animal.id, animal.name, animal.dob, animal.image, animal_type.name FROM animal INNER JOIN animal_type ON animal.animal_type_id=animal_type.id WHERE animal.uid=?");
+            PreparedStatement stmt = connection.prepareStatement("SELECT animal.id, animal.name, animal.dob, animal.image, animal.owner_id, animal_type.name FROM animal INNER JOIN animal_type ON animal.animal_type_id=animal_type.id WHERE animal.uid=?");
             stmt.setString(1, uid.getUidString());
             ResultSet result = stmt.executeQuery();
             Animal animal = null;
@@ -26,7 +26,8 @@ public abstract class AnimalHandler {
             	
             	Builder builder = new Animal.Builder(result.getInt("animal.id"), uid)
             				.withName(result.getString("animal.name"))
-            				.withType(result.getString("animal_type.name")
+            				.withType(result.getString("animal_type.name"))
+            				.withOwner(result.getInt("animal.owner_id")
             			);
             	
             	if(result.getBlob("animal.image") != null) {
@@ -77,6 +78,26 @@ public abstract class AnimalHandler {
             
             PreparedStatement stmt = connection.prepareStatement("UPDATE animal SET name=? WHERE id=?");
             stmt.setString(1, name);
+            stmt.setInt(2, animal.getId());
+            
+            stmt.executeUpdate();
+            
+            stmt.close();
+            connection.close();
+            return true;
+        } catch(Exception exception) {
+            System.out.println(exception);
+        }
+        
+        return false;
+	}
+	
+	public static boolean changeOwner(Animal animal, int ownerId) {
+		try {
+            Connection connection = DBConnection.getConnection();
+            
+            PreparedStatement stmt = connection.prepareStatement("UPDATE animal SET owner_id=? WHERE id=?");
+            stmt.setInt(1, ownerId);
             stmt.setInt(2, animal.getId());
             
             stmt.executeUpdate();

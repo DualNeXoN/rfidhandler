@@ -25,6 +25,7 @@ import rfidhandler.entity.animal.Animal;
 import rfidhandler.entity.animal.AnimalHandler;
 import rfidhandler.entity.animal.ui.AnimalCreateDialog;
 import rfidhandler.entity.animal.ui.AnimalTypeEditDialog;
+import rfidhandler.entity.owner.ui.OwnerEditDialog;
 import rfidhandler.entity.animal.ui.AnimalNameEditDialog;
 import rfidhandler.entity.animal.ui.AnimalNewRecordDialog;
 import rfidhandler.entity.animal.ui.AnimalDobEditDialog;
@@ -59,6 +60,7 @@ public class App {
 	private Label labelName;
 	private Label labelDob;
 	private Label labelType;
+	private Label labelOwner;
 	private ImageView blob;
 	private Button btnAddVaccine;
 	private VaccineTable vaccineTable;
@@ -80,6 +82,7 @@ public class App {
 		labelName = new Label("?");
 		labelDob = new Label("?");
 		labelType = new Label("?");
+		labelOwner = new Label("?");
 		blob = new ImageView(NO_IMAGE);
 		btnAddVaccine = new Button("Add vaccine");
 		vaccineTable = new VaccineTable();
@@ -122,6 +125,25 @@ public class App {
 			if(animal != null) contextMenuName.show(labelName, e.getScreenX(), e.getScreenY());
 		});
 		
+		ContextMenu contextMenuOwner = new ContextMenu();
+		MenuItem menuItemOwnerChange = new MenuItem("Edit");
+		menuItemOwnerChange.setOnAction(e -> {
+			if(animal == null) {
+				contextMenuOwner.hide();
+				return;
+			}
+			OwnerEditDialog dialog = new OwnerEditDialog();
+			dialog.showAndWait();
+			if(dialog.isCancelled()) return;
+			if(AnimalHandler.changeOwner(animal, dialog.getNewOwnerId())) {
+				loadAnimal(animal.getRfid().getUidString());
+			}
+		});
+		contextMenuOwner.getItems().add(menuItemOwnerChange);
+		labelOwner.setOnContextMenuRequested(e -> {
+			if(animal != null) contextMenuOwner.show(labelOwner, e.getScreenX(), e.getScreenY());
+		});
+		
 		ContextMenu contextMenuType = new ContextMenu();
 		MenuItem menuItemTypeChange = new MenuItem("Edit");
 		menuItemTypeChange.setOnAction(e -> {
@@ -139,7 +161,7 @@ public class App {
 		contextMenuType.getItems().add(menuItemTypeChange);
 		labelType.setOnContextMenuRequested(e -> {
 			if(animal != null) contextMenuType.show(labelType, e.getScreenX(), e.getScreenY());
-		});
+		});		
 		
 		ContextMenu contextMenuBlob = new ContextMenu();
 		MenuItem menuItemBlobChange = new MenuItem("Change");
@@ -199,8 +221,16 @@ public class App {
 		HBox typeBox = new HBox(new Label("Type: "), labelType);
 		typeBox.setSpacing(10);
 		typeBox.setAlignment(Pos.CENTER_LEFT);
+		
+		HBox ownerBox = new HBox(new Label("Owner: "), labelOwner);
+		ownerBox.setSpacing(10);
+		ownerBox.setAlignment(Pos.CENTER_LEFT);
+		
+		HBox btnVaccineBox = new HBox(btnAddVaccine);
+		btnVaccineBox.setSpacing(10);
+		btnVaccineBox.setAlignment(Pos.CENTER);
 
-		vBox.getChildren().addAll(connectionBox, idBox, rfidBox, dobBox, nameBox, typeBox, blob, btnAddVaccine, vaccineTable);
+		vBox.getChildren().addAll(connectionBox, idBox, rfidBox, dobBox, nameBox, typeBox, ownerBox, blob, btnVaccineBox, vaccineTable);
 		root.getChildren().add(vBox);
 
 		labelConnection.getStyleClass().add("connection-label");
@@ -209,6 +239,7 @@ public class App {
 		labelName.getStyleClass().add("info-label");
 		labelDob.getStyleClass().add("info-label");
 		labelType.getStyleClass().add("info-label");
+		labelOwner.getStyleClass().add("info-label");
 		blob.getStyleClass().add("imageView");
 		scene.getStylesheets().add("main.css");
 		btnAddVaccine.getStyleClass().add("button-add-vaccine");
@@ -223,7 +254,7 @@ public class App {
         });
 		stage.setScene(scene);
 		stage.setWidth(400);
-		stage.setHeight(600);
+		stage.setHeight(650);
 		stage.setResizable(false);
 		stage.setTitle(APP_NAME);
 		stage.getIcons().add(new Image(getClass().getResourceAsStream("/appicon.png")));
@@ -240,6 +271,7 @@ public class App {
 			labelName.setText(animal.getName());
 			labelDob.setText(animal.getDobFormatted().toString());
 			labelType.setText(animal.getType());
+			labelOwner.setText(animal.getOwner().toString());
 			blob.setImage(animal.getImage());
 			vaccineTable.applyItems(animal.getVaccines());
 		} else {
@@ -247,6 +279,7 @@ public class App {
 			labelName.setText("?");
 			labelDob.setText("?");
 			labelType.setText("?");
+			labelOwner.setText("?");
 			blob.setImage(NO_IMAGE);
 			if(AnimalNewRecordDialog.show()) {
 				AnimalCreateDialog dialog = new AnimalCreateDialog();
