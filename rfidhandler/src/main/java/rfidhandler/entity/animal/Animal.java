@@ -3,6 +3,7 @@ package rfidhandler.entity.animal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
@@ -20,6 +21,7 @@ public class Animal {
 	private int id;
 	private RfidUid rfid;
 	private String name = null;
+	private Date dob = null;
 	private String type = null;
 	private Image image = null;
 	private LinkedList<Vaccine> vaccines = null;
@@ -28,6 +30,7 @@ public class Animal {
 		this.id = builder.id;
 		this.rfid = builder.rfid;
 		this.name = builder.name;
+		this.dob = builder.dob;
 		this.type = builder.type;
 		this.image = builder.image;
 	}
@@ -42,6 +45,15 @@ public class Animal {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public Date getDob() {
+		return dob;
+	}
+	
+	public String getDobFormatted() {
+		if(dob != null) return dob.toString();
+		else return "unknown";
 	}
 	
 	public String getType() {
@@ -67,6 +79,7 @@ public class Animal {
 		private RfidUid rfid;
 		
 		private String name = null;
+		private Date dob = null;
 		private String type = null;
 		private Image image = App.NO_IMAGE;
 		
@@ -77,6 +90,11 @@ public class Animal {
 		
 		public Builder withName(String name) {
 			this.name = name;
+			return this;
+		}
+		
+		public Builder withDob(Date dob) {
+			this.dob = dob;
 			return this;
 		}
 		

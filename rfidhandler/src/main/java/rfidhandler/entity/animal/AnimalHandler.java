@@ -2,6 +2,7 @@ package rfidhandler.entity.animal;
 
 import java.sql.Blob;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public abstract class AnimalHandler {
         try {
             Connection connection = DBConnection.getConnection();
             
-            PreparedStatement stmt = connection.prepareStatement("SELECT animal.id, animal.name, animal.image, animal_type.name FROM animal INNER JOIN animal_type ON animal.animal_type_id=animal_type.id WHERE animal.uid=?");
+            PreparedStatement stmt = connection.prepareStatement("SELECT animal.id, animal.name, animal.dob, animal.image, animal_type.name FROM animal INNER JOIN animal_type ON animal.animal_type_id=animal_type.id WHERE animal.uid=?");
             stmt.setString(1, uid.getUidString());
             ResultSet result = stmt.executeQuery();
             Animal animal = null;
@@ -30,6 +31,10 @@ public abstract class AnimalHandler {
             	
             	if(result.getBlob("animal.image") != null) {
             		builder.withImage(result.getBlob("animal.image"));
+            	}
+            	
+            	if(result.getDate("animal.dob") != null) {
+            		builder.withDob(result.getDate("animal.dob"));
             	}
             	
             	animal = builder.build();
@@ -86,6 +91,26 @@ public abstract class AnimalHandler {
         return false;
 	}
 	
+	public static boolean changeDob(Animal animal, Date dob) {
+		try {
+            Connection connection = DBConnection.getConnection();
+            
+            PreparedStatement stmt = connection.prepareStatement("UPDATE animal SET dob=? WHERE id=?");
+            stmt.setDate(1, dob);
+            stmt.setInt(2, animal.getId());
+            
+            stmt.executeUpdate();
+            
+            stmt.close();
+            connection.close();
+            return true;
+        } catch(Exception exception) {
+            System.out.println(exception);
+        }
+        
+        return false;
+	}
+	
 	public static boolean changeType(Animal animal, int typeId) {
 		try {
             Connection connection = DBConnection.getConnection();
@@ -127,14 +152,15 @@ public abstract class AnimalHandler {
 		return list;
 	}
 	
-	public static boolean createAnimal(String uid, String name, int animalTypeId) {
+	public static boolean createAnimal(String uid, String name, Date dob, int animalTypeId) {
 		try {
             Connection connection = DBConnection.getConnection();
             
-            PreparedStatement stmt = connection.prepareStatement("INSERT INTO animal (uid, name, animal_type_id) VALUES (?, ?, ?)");
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO animal (uid, name, dob, animal_type_id) VALUES (?, ?, ?, ?)");
             stmt.setString(1, uid);
             stmt.setString(2, name);
-            stmt.setInt(3, animalTypeId);
+            stmt.setDate(3, dob);
+            stmt.setInt(4, animalTypeId);
             
             stmt.execute();
             

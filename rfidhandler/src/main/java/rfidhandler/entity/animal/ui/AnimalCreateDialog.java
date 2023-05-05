@@ -1,11 +1,14 @@
 package rfidhandler.entity.animal.ui;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -24,7 +27,10 @@ public class AnimalCreateDialog extends Stage {
 	
 	private boolean isCancelled = false;
 	private ChoiceBox<AnimalType> choiceBox;
+	private DatePicker datePicker;
 	private TextField nameField;
+	
+	private Date date = null;
 
 	public AnimalCreateDialog() {
 	    getIcons().add(new Image(getClass().getResourceAsStream("/appicon.png")));
@@ -58,6 +64,12 @@ public class AnimalCreateDialog extends Stage {
 	    Label typeLabel = new Label("Type:");
 	    nameField = new TextField();
 	    nameField.setPromptText("Name");
+	    
+	    datePicker = new DatePicker();
+	    datePicker.setOnAction(e -> {
+	        LocalDate localDate = datePicker.getValue();
+	        date = Date.valueOf(localDate);
+	    });
 
 	    Button confirmButton = new Button("Confirm");
 	    confirmButton.getStyleClass().add("button-add");
@@ -74,7 +86,7 @@ public class AnimalCreateDialog extends Stage {
 	    HBox buttonBox = new HBox(confirmButton, cancelButton);
 	    buttonBox.setSpacing(10);
 
-	    VBox vBox = new VBox(typeLabel, choiceBox, nameField, buttonBox);
+	    VBox vBox = new VBox(typeLabel, choiceBox, datePicker, nameField, buttonBox);
 	    vBox.setSpacing(10);
 	    vBox.setPadding(new Insets(10));
 	    vBox.setBackground(new Background(new BackgroundFill(Color.WHITE, new CornerRadii(5), Insets.EMPTY)));
@@ -87,6 +99,10 @@ public class AnimalCreateDialog extends Stage {
 
 	public int getNewTypeId() {
 	    return choiceBox.getValue().getId();
+	}
+	
+	public Date getDate() {
+		return date;
 	}
 
 	public String getNewName() {

@@ -24,9 +24,10 @@ import javafx.stage.Stage;
 import rfidhandler.entity.animal.Animal;
 import rfidhandler.entity.animal.AnimalHandler;
 import rfidhandler.entity.animal.ui.AnimalCreateDialog;
+import rfidhandler.entity.animal.ui.AnimalTypeEditDialog;
 import rfidhandler.entity.animal.ui.AnimalNameEditDialog;
 import rfidhandler.entity.animal.ui.AnimalNewRecordDialog;
-import rfidhandler.entity.animal.ui.AnimalTypeEditDialog;
+import rfidhandler.entity.animal.ui.AnimalDobEditDialog;
 import rfidhandler.entity.rfid.RfidUid;
 import rfidhandler.entity.vaccine.VaccineHandler;
 import rfidhandler.entity.vaccine.ui.VaccineAddDialog;
@@ -56,6 +57,7 @@ public class App {
 	private Label labelId;
 	private Label labelRfid;
 	private Label labelName;
+	private Label labelDob;
 	private Label labelType;
 	private ImageView blob;
 	private Button btnAddVaccine;
@@ -76,10 +78,30 @@ public class App {
 		labelRfid = new Label("?");
 		labelId = new Label("?");
 		labelName = new Label("?");
+		labelDob = new Label("?");
 		labelType = new Label("?");
 		blob = new ImageView(NO_IMAGE);
 		btnAddVaccine = new Button("Add vaccine");
 		vaccineTable = new VaccineTable();
+		
+		ContextMenu contextMenuDob = new ContextMenu();
+		MenuItem menuItemDobChange = new MenuItem("Edit");
+		menuItemDobChange.setOnAction(e -> {
+			if(animal == null) {
+				contextMenuDob.hide();
+				return;
+			}
+			AnimalDobEditDialog dialog = new AnimalDobEditDialog();
+			dialog.showAndWait();
+			if(dialog.isCancelled()) return;
+			if(AnimalHandler.changeDob(animal, dialog.getDob())) {
+				loadAnimal(animal.getRfid().getUidString());
+			}
+		});
+		contextMenuDob.getItems().add(menuItemDobChange);
+		labelDob.setOnContextMenuRequested(e -> {
+			if(animal != null) contextMenuDob.show(labelType, e.getScreenX(), e.getScreenY());
+		});
 		
 		ContextMenu contextMenuName = new ContextMenu();
 		MenuItem menuItemNameChange = new MenuItem("Edit");
@@ -169,18 +191,23 @@ public class App {
 		HBox nameBox = new HBox(new Label("Name: "), labelName);
 		nameBox.setSpacing(10);
 		nameBox.setAlignment(Pos.CENTER_LEFT);
+		
+		HBox dobBox = new HBox(new Label("DoB: "), labelDob);
+		dobBox.setSpacing(10);
+		dobBox.setAlignment(Pos.CENTER_LEFT);
 
 		HBox typeBox = new HBox(new Label("Type: "), labelType);
 		typeBox.setSpacing(10);
 		typeBox.setAlignment(Pos.CENTER_LEFT);
 
-		vBox.getChildren().addAll(connectionBox, idBox, rfidBox, nameBox, typeBox, blob, btnAddVaccine, vaccineTable);
+		vBox.getChildren().addAll(connectionBox, idBox, rfidBox, dobBox, nameBox, typeBox, blob, btnAddVaccine, vaccineTable);
 		root.getChildren().add(vBox);
 
 		labelConnection.getStyleClass().add("connection-label");
 		labelId.getStyleClass().add("info-label");
 		labelRfid.getStyleClass().add("info-label");
 		labelName.getStyleClass().add("info-label");
+		labelDob.getStyleClass().add("info-label");
 		labelType.getStyleClass().add("info-label");
 		blob.getStyleClass().add("imageView");
 		scene.getStylesheets().add("main.css");
@@ -211,19 +238,21 @@ public class App {
 		if(animal != null) {
 			labelId.setText(Integer.toString(animal.getId()));
 			labelName.setText(animal.getName());
+			labelDob.setText(animal.getDobFormatted().toString());
 			labelType.setText(animal.getType());
 			blob.setImage(animal.getImage());
 			vaccineTable.applyItems(animal.getVaccines());
 		} else {
 			labelId.setText("?");
 			labelName.setText("?");
+			labelDob.setText("?");
 			labelType.setText("?");
 			blob.setImage(NO_IMAGE);
 			if(AnimalNewRecordDialog.show()) {
 				AnimalCreateDialog dialog = new AnimalCreateDialog();
 				dialog.showAndWait();
 				if(dialog.isCancelled()) return;
-				if(AnimalHandler.createAnimal(uid, dialog.getNewName(), dialog.getNewTypeId())) {
+				if(AnimalHandler.createAnimal(uid, dialog.getNewName(), dialog.getDate(), dialog.getNewTypeId())) {
 					loadAnimal(uid);
 				}
 			}
