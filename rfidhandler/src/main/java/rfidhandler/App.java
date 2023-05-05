@@ -287,12 +287,12 @@ public class App {
 			public void run() {
 				labelConnection.setText(String.format(FORMATTER_CONNECTION_STATUS, status.name().toLowerCase()));
 				if(status.equals(ConnectionStatus.CONNECTED)) {
-					labelConnection.getStyleClass().add("connected");
-					labelConnection.getStyleClass().remove("disconnected");
+					labelConnection.getStyleClass().add(ConnectionStatus.CONNECTED.name().toLowerCase());
+					labelConnection.getStyleClass().remove(ConnectionStatus.DISCONNECTED.name().toLowerCase());
 				}
 				else {
-					labelConnection.getStyleClass().add("disconnected");
-					labelConnection.getStyleClass().remove("connected");
+					labelConnection.getStyleClass().add(ConnectionStatus.DISCONNECTED.name().toLowerCase());
+					labelConnection.getStyleClass().remove(ConnectionStatus.CONNECTED.name().toLowerCase());
 				}
 			}
 		});
